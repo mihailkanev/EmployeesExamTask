@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -24,8 +25,8 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Transactional
-    public void saveAll(List<Employee> employees) {
-        employeeRepository.saveAll(employees);
+    public void saveAll(Map<Long,Employee> employees) {
+        employeeRepository.saveAll(employees.values());
     }
 
     public List<EmployeeDTO> findLongestWorkingPair() {
@@ -43,18 +44,11 @@ public class EmployeeService {
                             employee2.getDateFrom(), employee2.getDateTo()
                     );
 
-                    // Enhanced logging
-                    System.out.println("Pair: " + employee1.getEmpId() + " - " + employee2.getEmpId());
-                    System.out.println("Employee1 Dates: " + employee1.getDateFrom() + " - " + employee1.getDateTo());
-                    System.out.println("Employee2 Dates: " + employee2.getDateFrom() + " - " + employee2.getDateTo());
-
                     EmployeeDTO employeeDTO = createEmployeeDTO(employee1, employee2, overlapDays);
                     workingPairsDTO.add(employeeDTO);
                 }
             }
         }
-        System.out.println("Final Result: " + workingPairsDTO);
-
         return workingPairsDTO;
     }
 
