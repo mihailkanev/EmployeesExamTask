@@ -33,8 +33,6 @@ public class EmployeeDTO {
     @NotNull
     private LocalDate endDate;
 
-    private Duration duration;
-
     @Positive(message = "overlapDays must be positive")
     private long overlapDays;
 
