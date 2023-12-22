@@ -3,6 +3,8 @@ package com.sirma.exam.service;
 import com.sirma.exam.dto.EmployeeDTO;
 import com.sirma.exam.model.Employee;
 import com.sirma.exam.reposiory.EmployeeRepository;
+import com.sirma.exam.validations.EmployeeValidationService;
+import com.sirma.exam.validations.EmployeeValidationServiceImpl;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ import java.util.Optional;
 @Service
 public class EmployeeService {
 
+    @Autowired
+    private EmployeeValidationService employeeValidationService;
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -80,7 +84,7 @@ public class EmployeeService {
 
     private LocalDate calculateOverlapEnd(LocalDate end1, LocalDate end2) {
         if (end1 == null || end2 == null) {
-            return LocalDate.now(); // Връщайте текущата дата, когато една от двете дати е null
+            return LocalDate.now();
         }
 
         return end1.isBefore(end2) ? end1 : end2;
@@ -105,10 +109,8 @@ public class EmployeeService {
         if (existingEmployeeOptional.isPresent()) {
             Employee existingEmployee = existingEmployeeOptional.get();
 
-            // Use the Lombok-generated setEmpId method
             existingEmployee.setEmpId(updatedEmployee.getEmpId());
 
-            // Set other fields similarly
             existingEmployee.setProjectId(updatedEmployee.getProjectId());
             existingEmployee.setDateFrom(updatedEmployee.getDateFrom());
             existingEmployee.setDateTo(updatedEmployee.getDateTo());
@@ -121,6 +123,6 @@ public class EmployeeService {
     }
 
     public void save(Employee employee) {
-        employeeRepository.save(employee);
+        employeeValidationService.validateEmployee(employee);
     }
 }
