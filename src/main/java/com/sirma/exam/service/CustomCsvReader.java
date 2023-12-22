@@ -22,20 +22,32 @@ public class CustomCsvReader {
             String line;
 
             while ((line = br.readLine()) != null) {
-                processCsvLine(line, employees);
+                try {
+                    processCsvLine(line, employees);
+                } catch (Exception e) {
+                    System.err.println("Error processing CSV line: " + line);
+                    e.printStackTrace();
+                }
             }
-        }
 
-        return employees;
+            return employees;
+        }
     }
 
     private void processCsvLine(String line, List<Employee> employees) {
         String[] data = line.split(",");
 
-        long employeeId = Long.parseLong(data[0].trim());
-        long projectId = Long.parseLong(data[1].trim());
-        LocalDate startDate = parseDate(data[2].trim());
-        LocalDate endDate = parseDate(data[3]);
+        if (data.length != 4) {
+            System.err.println("Invalid CSV line: " + line);
+            return;
+        }
+
+        try {
+            long employeeId = Long.parseLong(data[0].trim());
+            long projectId = Long.parseLong(data[1].trim());
+            LocalDate startDate = parseDate(data[2].trim());
+            LocalDate endDate = parseDate(data[3].trim());
+
             Employee employee = new Employee();
             employee.setEmpId(employeeId);
             employee.setProjectId(projectId);
@@ -43,7 +55,9 @@ public class CustomCsvReader {
             employee.setDateTo(endDate);
 
             employees.add(employee);
-
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing CSV line: " + line);
+        }
     }
     private static LocalDate parseDate(String dateString) {
         if (dateString != null && !dateString.trim().equalsIgnoreCase("NULL")) {
@@ -55,8 +69,8 @@ public class CustomCsvReader {
                     "dd/MM/yyyy",
                     "yyyy/MM/dd",
                     "dd-MMM-yyyy",
-                    "dd.MM.yyyy",  // Bulgarian date format example
-                    "yyyy.MM.dd"   // Another Bulgarian date format example
+                    "dd.MM.yyyy",
+                    "yyyy.MM.dd"
             };
 
             for (String format : dateFormats) {
