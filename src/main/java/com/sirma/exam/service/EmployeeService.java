@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class EmployeeService {
@@ -24,9 +21,32 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    private Set<Long> processedEmployeeIds = new HashSet<>();
+
+
     @Transactional
     public void saveAll(Map<Long, Employee> employees) {
-        employeeRepository.saveAll(employees.values());
+        for (Employee employee : employees.values()) {
+            Long empId = employee.getEmpId();
+
+            if (!processedEmployeeIds.contains(empId)) {
+                Optional<Employee> existingEmployee = employeeRepository.findById(empId);
+
+                if (existingEmployee.isEmpty()) {
+                    employeeRepository.save(employee);
+                } else {
+                    existingEmployee.ifPresent(emp -> updateEmployee(emp, employee));
+                }
+
+                processedEmployeeIds.add(empId);
+            }
+        }
+    }
+    private void updateEmployee(Employee existEmployee, Employee newEmployee) {
+        existEmployee.setProjectId(newEmployee.getProjectId());
+        existEmployee.setDateFrom(newEmployee.getDateFrom());
+        existEmployee.setDateTo(newEmployee.getDateTo());
+        employeeRepository.save(existEmployee);
     }
 
     public List<EmployeeDTO> findLongestWorkingPair() {
