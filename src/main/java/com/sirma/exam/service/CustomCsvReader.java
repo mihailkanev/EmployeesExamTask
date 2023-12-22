@@ -9,30 +9,29 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Locale;
+import java.util.*;
 
 @Component
 public class CustomCsvReader {
-    public Map<Long, Employee> readCsv(String filePath) throws IOException {
-        Map<Long, Employee> employeeMap = new HashMap<>();
+        private Set<Long> processedEmployeeIds = new HashSet<>();
+        public Map<Long, Employee> readCsv(String filePath) throws IOException {
+            Map<Long, Employee> employeeMap = new HashMap<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
+            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                String line;
 
-            while ((line = br.readLine()) != null) {
-                try {
-                    processCsvLine(line, employeeMap);
-                } catch (Exception e) {
-                    System.err.println("Error processing CSV line: " + line);
-                    e.printStackTrace();
+                while ((line = br.readLine()) != null) {
+                    try {
+                        processCsvLine(line, employeeMap);
+                    } catch (Exception e) {
+                        System.err.println("Error processing CSV line: " + line);
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
 
-        return employeeMap;
-    }
+            return employeeMap;
+        }
 
     private void processCsvLine(String line, Map<Long, Employee> employeeMap) {
         String[] data = line.split(",");
@@ -48,17 +47,33 @@ public class CustomCsvReader {
             LocalDate startDate = parseDate(data[2].trim());
             LocalDate endDate = parseDate(data[3].trim());
 
+            if (employeeMap.containsKey(employeeId)) {
+                Employee existingEmployee = employeeMap.get(employeeId);
+
+                if (!existingEmployee.getProjectId().equals(projectId)
+                        || !existingEmployee.getDateFrom().equals(startDate)
+                        || !existingEmployee.getDateTo().equals(endDate)) {
+
+                    existingEmployee.setProjectId(projectId);
+                    existingEmployee.setDateFrom(startDate);
+                    existingEmployee.setDateTo(endDate);
+                }
+
+                return;
+            }
+
             Employee employee = new Employee();
             employee.setEmpId(employeeId);
             employee.setProjectId(projectId);
             employee.setDateFrom(startDate);
             employee.setDateTo(endDate);
 
-            employeeMap.put(employeeId, employee);
+            processedEmployeeIds.add(employeeId);
         } catch (NumberFormatException e) {
             System.err.println("Error parsing CSV line: " + line);
         }
     }
+
 
     private static LocalDate parseDate(String dateString) {
         if (dateString != null && !dateString.trim().equalsIgnoreCase("NULL")) {
