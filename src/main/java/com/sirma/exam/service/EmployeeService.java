@@ -25,7 +25,7 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     @Transactional
-    public void saveAll(Map<Long,Employee> employees) {
+    public void saveAll(Map<Long, Employee> employees) {
         employeeRepository.saveAll(employees.values());
     }
 
@@ -44,8 +44,17 @@ public class EmployeeService {
                             employee2.getDateFrom(), employee2.getDateTo()
                     );
 
-                    EmployeeDTO employeeDTO = createEmployeeDTO(employee1, employee2, overlapDays);
-                    workingPairsDTO.add(employeeDTO);
+                    // Check if the same pair already exists in the result
+                    boolean pairExists = workingPairsDTO.stream()
+                            .anyMatch(pair -> (pair.getEmpId1().equals(employee1.getEmpId()) &&
+                                    pair.getEmpId2().equals(employee2.getEmpId())) ||
+                                    (pair.getEmpId1().equals(employee2.getEmpId()) &&
+                                            pair.getEmpId2().equals(employee1.getEmpId())));
+
+                    if (!pairExists) {
+                        EmployeeDTO employeeDTO = createEmployeeDTO(employee1, employee2, overlapDays);
+                        workingPairsDTO.add(employeeDTO);
+                    }
                 }
             }
         }
@@ -112,6 +121,7 @@ public class EmployeeService {
             employeeRepository.save(existingEmployee);
         }
     }
+
     public void deleteById(Long id) {
         employeeRepository.deleteById(id);
     }
@@ -119,4 +129,5 @@ public class EmployeeService {
     public void save(Employee employee) {
         employeeValidationService.validateEmployee(employee);
     }
+
 }
