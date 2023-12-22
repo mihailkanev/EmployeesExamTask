@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CsvLoaderService {
@@ -25,7 +26,7 @@ public class CsvLoaderService {
         try {
             filePathValidator.validateFilePath(filePath);
             CustomCsvReader csvReader = new CustomCsvReader();
-            List<Employee> employees = csvReader.readCsv(filePath);
+            Map<Long, Employee> employees = csvReader.readCsv(filePath);
 
             employeeService.saveAll(employees);
         } catch (IOException e) {
