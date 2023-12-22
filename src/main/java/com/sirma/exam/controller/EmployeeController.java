@@ -3,6 +3,7 @@ package com.sirma.exam.controller;
 import com.sirma.exam.dto.EmployeeDTO;
 import com.sirma.exam.model.Employee;
 import com.sirma.exam.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<Object> createEmployee(@Valid @RequestBody Employee employee) {
         try {
             employeeService.save(employee);
             return ResponseEntity.status(HttpStatus.CREATED).body("Employee created successfully");
@@ -56,7 +57,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
+    public ResponseEntity<Object> updateEmployee(@PathVariable Long id,@Valid @RequestBody Employee updatedEmployee) {
         try {
             employeeService.update(id, updatedEmployee);
             return ResponseEntity.ok("Employee updated successfully");
