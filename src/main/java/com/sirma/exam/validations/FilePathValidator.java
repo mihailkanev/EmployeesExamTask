@@ -12,11 +12,10 @@ import java.util.List;
 public class FilePathValidator {
 
     public void validateFilePath(String filePath) throws IOException {
-        if (filePath.isEmpty()) {
-            throw new IOException("File path is empty");
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IOException("File path is empty or null");
         }
     }
-
     public void validateCsvData(List<Employee> employees) throws ValidationException {
         if (employees == null || employees.isEmpty()) {
             throw new ValidationException("CSV data is empty");
