@@ -4,7 +4,6 @@ import com.sirma.exam.dto.EmployeeDTO;
 import com.sirma.exam.model.Employee;
 import com.sirma.exam.reposiory.EmployeeRepository;
 import com.sirma.exam.validations.EmployeeValidationService;
-import com.sirma.exam.validations.EmployeeValidationServiceImpl;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
