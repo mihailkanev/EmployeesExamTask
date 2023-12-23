@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -149,4 +150,10 @@ public class EmployeeService {
         employeeValidationService.validateEmployee(employee);
     }
 
+    public List<Long> getAllEmployeeIds() {
+        List<Employee> employees = employeeRepository.findAll();
+        return employees.stream()
+                .map(Employee::getEmpId)
+                .collect(Collectors.toList());
+    }
 }
