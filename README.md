@@ -1,4 +1,4 @@
-# Employee Management REST API
+# Employees REST API
 
 ## Endpoints
 
