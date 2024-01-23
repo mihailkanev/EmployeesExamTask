@@ -49,9 +49,10 @@ public class EmployeeService {
         employeeRepository.save(existEmployee);
     }
 
-    public List<EmployeeDTO> findLongestWorkingPair() {
+    public EmployeeDTO findLongestWorkingPair() {
         List<Employee> allEmployees = employeeRepository.findAll();
-        List<EmployeeDTO> workingPairsDTO = new ArrayList<>();
+        EmployeeDTO maxOverlapPair = null;
+        long maxOverlapDays = 0;
 
         for (int i = 0; i < allEmployees.size(); i++) {
             for (int j = i + 1; j < allEmployees.size(); j++) {
@@ -64,21 +65,15 @@ public class EmployeeService {
                             employee2.getDateFrom(), employee2.getDateTo()
                     );
 
-                    // Check if the same pair already exists in the result
-                    boolean pairExists = workingPairsDTO.stream()
-                            .anyMatch(pair -> (pair.getEmpId1().equals(employee1.getEmpId()) &&
-                                    pair.getEmpId2().equals(employee2.getEmpId())) ||
-                                    (pair.getEmpId1().equals(employee2.getEmpId()) &&
-                                            pair.getEmpId2().equals(employee1.getEmpId())));
-
-                    if (!pairExists) {
-                        EmployeeDTO employeeDTO = createEmployeeDTO(employee1, employee2, overlapDays);
-                        workingPairsDTO.add(employeeDTO);
+                    if (overlapDays > maxOverlapDays) {
+                        maxOverlapDays = overlapDays;
+                        maxOverlapPair = createEmployeeDTO(employee1, employee2, overlapDays);
                     }
                 }
             }
         }
-        return workingPairsDTO;
+
+        return maxOverlapPair;
     }
 
     private boolean areEmployeesWorkingTogetherOnSameProject(Employee employee1, Employee employee2) {
