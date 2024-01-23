@@ -20,9 +20,9 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @GetMapping("/longest-working-pair")
-    public ResponseEntity<Object> getLongestWorkingPair() {
+    public ResponseEntity<Object> findLongestWorkingPair() {
         try {
-            List<EmployeeDTO> longestWorkingPair = employeeService.findLongestWorkingPair();
+            EmployeeDTO longestWorkingPair = employeeService.findLongestWorkingPair();
             return ResponseEntity.ok(longestWorkingPair);
         } catch (Exception e) {
             e.printStackTrace();
