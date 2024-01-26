@@ -70,27 +70,20 @@ public class CustomCsvReader {
 
     private static LocalDate parseDate(String dateString) {
         if (dateString != null && !dateString.trim().equalsIgnoreCase("NULL")) {
-            String[] dateFormats = {
-                    "yyyy-MM-dd",
-                    "MM/dd/yyyy",
-                    "yyyyMMdd",
-                    "dd/MM/yyyy",
-                    "yyyy/MM/dd",
-                    "dd-MMM-yyyy",
-                    "dd.MM.yyyy",
-                    "yyyy.MM.dd"
+            DateTimeFormatter[] dateFormats = {
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+                    DateTimeFormatter.ofPattern("MM/dd/yyyy"),
+                    DateTimeFormatter.ofPattern("yyyyMMdd"),
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+                    DateTimeFormatter.ofPattern("yyyy/MM/dd"),
+                    DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+                    DateTimeFormatter.ofPattern("yyyy.MM.dd")
             };
 
-            for (String format : dateFormats) {
+            for (DateTimeFormatter format : dateFormats) {
                 try {
-                    DateTimeFormatter dateFormat;
-                    if (format.equals("dd-MMM-yyyy")) {
-                        dateFormat = DateTimeFormatter.ofPattern(format, new Locale("en", "US"));
-                    } else {
-                        dateFormat = DateTimeFormatter.ofPattern(format);
-                    }
-                    return LocalDate.parse(dateString.trim(), dateFormat);
-                } catch (DateTimeParseException e) {
+                    return LocalDate.parse(dateString.trim(), format);
+                } catch (Exception ignored) {
                 }
             }
         }
