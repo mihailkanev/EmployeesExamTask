@@ -49,8 +49,7 @@ public class EmployeeService {
         employeeRepository.save(existEmployee);
     }
 
-    public EmployeeDTO findLongestWorkingPair() {
-        List<Employee> allEmployees = employeeRepository.findAll();
+    public EmployeeDTO findLongestWorkingPair(List<Employee> allEmployees) {
         EmployeeDTO maxOverlapPair = null;
         long maxOverlapDays = 0;
 
@@ -76,6 +75,7 @@ public class EmployeeService {
         return maxOverlapPair;
     }
 
+
     private boolean areEmployeesWorkingTogetherOnSameProject(Employee employee1, Employee employee2) {
         return !employee1.getEmpId().equals(employee2.getEmpId()) &&
                 employee1.getProjectId().equals(employee2.getProjectId());
@@ -97,8 +97,9 @@ public class EmployeeService {
     }
 
     private LocalDate calculateOverlapStart(LocalDate start1, LocalDate start2) {
-        return start1.isAfter(start2) ? start1 : start2;
+        return start1.isAfter(start2) || start1.isEqual(start2) ? start1 : start2;
     }
+
 
     private LocalDate calculateOverlapEnd(LocalDate end1, LocalDate end2) {
         if (end1 == null || end2 == null) {
@@ -151,4 +152,5 @@ public class EmployeeService {
                 .map(Employee::getEmpId)
                 .collect(Collectors.toList());
     }
+
 }
