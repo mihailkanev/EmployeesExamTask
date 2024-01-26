@@ -2,15 +2,17 @@ package com.sirma.exam.controller;
 
 import com.sirma.exam.dto.EmployeeDTO;
 import com.sirma.exam.model.Employee;
+import com.sirma.exam.service.CustomCsvReader;
 import com.sirma.exam.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -19,15 +21,22 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    @Autowired
+    private CustomCsvReader customCsvReader;
+
     @GetMapping("/longest-working-pair")
+
     public ResponseEntity<Object> findLongestWorkingPair() {
         try {
-            EmployeeDTO longestWorkingPair = employeeService.findLongestWorkingPair();
+            String filePath = "exam/src/main/java/com/sirma/exam/data/data.csv";
+            Set<Long> existingEmployeeIds = new HashSet<>();
+            Map<Long, Employee> employeeMap = customCsvReader.readCsv(filePath, existingEmployeeIds);
+            EmployeeDTO longestWorkingPair = employeeService.findLongestWorkingPair(new ArrayList<>(employeeMap.values()));
             return ResponseEntity.ok(longestWorkingPair);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An error occurred during the calculation. Check the logs for more details.");
+                    .body("An error occurred during CSV reading. Check the logs for more details.");
         }
     }
 
@@ -35,7 +44,7 @@ public class EmployeeController {
     public ResponseEntity<Object> getEmployeeById(@PathVariable Long id) {
         try {
             Optional<Employee> employee = employeeService.findById(id);
-            return employee.map(value -> ResponseEntity.ok((Object)value))
+            return employee.map(value -> ResponseEntity.ok((Object) value))
                     .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,7 +66,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateEmployee(@PathVariable Long id,@Valid @RequestBody Employee updatedEmployee) {
+    public ResponseEntity<Object> updateEmployee(@PathVariable Long id, @Valid @RequestBody Employee updatedEmployee) {
         try {
             employeeService.update(id, updatedEmployee);
             return ResponseEntity.ok("Employee updated successfully");
